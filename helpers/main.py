@@ -2,10 +2,12 @@ from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 
 # Return response data
-def response_data(status, detail, data=None):
+def response_data(status, detail, errors=None, data=None):
     response_dict = {"status": status, "detail": detail}
     if data is not None:
         response_dict["data"] = data
+    if errors is not None:
+        response_dict["errors"] = errors
 
     return response_dict
 

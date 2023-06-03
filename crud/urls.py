@@ -1,16 +1,13 @@
 from django.urls import path
+
 from . import views
 
 urlpatterns = [
-    path(
-        "get-all-data/",
-        views.get_all_data,
-        name="Get All Data"
-    ),
+    path("get-all-data/", views.get_all_data, name="Get All Data"),
     path(
         "get-all-data/<int:page_number>/",
         views.get_all_data_paginated,
-        name="Get All Data Paginated"
+        name="Get All Data Paginated",
     ),
     path(
         "get-one-data/<slug:attr>/<slug:val>/<slug:value_type>/",
@@ -34,7 +31,7 @@ urlpatterns = [
     ),
     path(
         "delete-many-data/",
-        views.delete_data,
-        name="Delete Data",
+        views.delete_many_data,
+        name="Delete Multiple Data",
     ),
 ]

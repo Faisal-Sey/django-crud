@@ -1,8 +1,11 @@
+import json
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import CRUDTestModel
+
 from helpers.main import paginate_data, response_data
-import json
+
+from .models import CRUDTestModel
 
 
 # View to retrieve all the data
@@ -21,16 +24,14 @@ def get_all_data(request, *args, **kwargs):
     if "order_by" in list(request_data.keys()):
         # Order by field passed in the request
         query_data = query_data.order_by(request_data.get("order_by"))
-   
+
     # Convert to a list of objects
     data = list(query_data.values())
 
     # Return response
     return JsonResponse(
         response_data(
-            status="success",
-            detail="Data retrieved successfully",
-            data=data
+            status="success", detail="Data retrieved successfully", data=data
         ),
         safe=False,
     )
@@ -46,14 +47,14 @@ def get_all_data_paginated(request, *args, **kwargs):
         request_data = json.loads(request.body)
 
     # Get current page number
-    page_number = kwargs.get('page_number')
+    page_number = kwargs.get("page_number")
     # Retrieve all data
     query_data = CRUDTestModel.objects.all()
 
     if "order_by" in list(request_data.keys()):
         # Order by field passed in the request
         query_data = query_data.order_by(request_data.get("order_by"))
-        
+
     # Convert to a list of objects
     data = list(query_data.values())
     # Paginate data
@@ -89,28 +90,22 @@ def get_one_data(request, *args, **kwargs):
 
         # Convert query data to a dictionary
         data = query_data.to_dict()
-
         return JsonResponse(
             response_data(
-                status="success",
-                detail="Data retrieved successfully",
-                data=data
+                status="success", detail="Data retrieved successfully", data=data
             ),
             safe=False,
         )
     except CRUDTestModel.DoesNotExist:
         return JsonResponse(
-            response_data(
-                status="error",
-                detail="Data does not exist"
-            ), safe=False
+            response_data(status="error", detail="Data does not exist"), safe=False
         )
 
 
 # View to add data to the database
 @csrf_exempt
 def add_data(request, *args, **kwargs):
-    if request.method == 'POST':
+    if request.method == "POST":
         # Retrieve data from the request
         data = json.loads(request.body)
         try:
@@ -122,9 +117,7 @@ def add_data(request, *args, **kwargs):
 
             return JsonResponse(
                 response_data(
-                    status="success",
-                    detail="Data added successfully",
-                    data=resp_data
+                    status="success", detail="Data added successfully", data=resp_data
                 ),
                 safe=False,
             )
@@ -149,9 +142,9 @@ def add_data(request, *args, **kwargs):
 # View to update data
 @csrf_exempt
 def update_data(request, *args, **kwargs):
-    if request.method == 'PATCH':
+    if request.method == "PATCH":
         # Get id of data
-        data_id = kwargs.get('data_id')
+        data_id = kwargs.get("data_id")
 
         # Request data
         data = json.loads(request.body)
@@ -165,9 +158,7 @@ def update_data(request, *args, **kwargs):
             test_model = CRUDTestModel.objects.get(id=data_id)
             return JsonResponse(
                 response_data(
-                    status="error",
-                    detail="Data not found",
-                    data=test_model.to_dict()
+                    status="error", detail="Data not found", data=test_model.to_dict()
                 ),
                 safe=False,
             )
@@ -192,13 +183,12 @@ def update_data(request, *args, **kwargs):
 # View to delete a data
 @csrf_exempt
 def delete_data(request, *args, **kwargs):
-    if request.method == 'DELETE':
+    if request.method == "DELETE":
         # Get data id from request
-        data_id = kwargs.get('data_id')
+        data_id = kwargs.get("data_id")
         try:
             # Retrieve data from database
             db_data = CRUDTestModel.objects.get(id=data_id)
-            print(db_data)
 
             # Delete data from database
             db_data.delete()
@@ -232,9 +222,9 @@ def delete_data(request, *args, **kwargs):
 # View to delete multiple data
 @csrf_exempt
 def delete_many_data(request, *args, **kwargs):
-    if request.method == 'POST':
+    if request.method == "POST":
         # Data ids to be deleted
-        data_ids = json.loads(request.POST)
+        data_ids = json.loads(request.body).get("data_ids")
 
         # Keep track of errors
         deletion_errors = {}
@@ -250,14 +240,21 @@ def delete_many_data(request, *args, **kwargs):
 
             except CRUDTestModel.DoesNotExist:
                 # Set error message when data is not found
-                deletion_errors[id] = "Deletion failed"
-      
+                deletion_errors[data_id] = "Deletion failed"
+
+        error_length = len(list(deletion_errors.keys()))
+
+        resp_data = {"status": "success", "detail": "Data deleted successfully"}
+
+        # there are errors
+        if error_length:
+            resp_data["status"] = "error"
+            resp_data["detail"] = "Failed to delete some data"
+            resp_data["errors"] = deletion_errors
+
         # Return response
         return JsonResponse(
-            response_data(
-                status="error",
-                detail="Data deleted successfully",
-            ),
+            response_data(**resp_data),
             safe=False,
         )
 
