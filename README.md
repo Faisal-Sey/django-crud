@@ -32,6 +32,10 @@ To set up the Django CRUD project, follow these steps:
 
 The project should now be up and running, and you can access the CRUD operations through the defined URLs.
 
-Please note that this is a basic setup guide, and you may need to customize it based on your specific environment and requirements.
+## Postman Documentation
+
+You can find detailed documentation of the API endpoints and their usage in Postman by following this [link](https://documenter.getpostman.com/view/12600570/2s93sW9FZn). The documentation provides information about each endpoint, including the method, URL, parameters, and request/response examples.
+
+Please refer to the Postman documentation for a more comprehensive understanding of the API endpoints and how to interact with them.
 
 Feel free to explore and modify the code to suit your needs. Happy coding!
